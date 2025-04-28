@@ -1,13 +1,14 @@
 package service
 
 import (
+	m "auth-service-medods/internal/models"
 	"auth-service-medods/internal/storage"
-	t "auth-service-medods/token"
+	t "auth-service-medods/internal/token"
 	"fmt"
 )
 
 // генерация токенов access и refresh
-func GenerateTokens(userID, ip string, db *storage.DB) (*Tokens, error) {
+func GenerateTokens(userID, ip string, db *storage.DB) (*m.Tokens, error) {
 	// генерация access токена
 	accessToken, err := t.GetAccessToken(userID, ip)
 	if err != nil {
@@ -26,7 +27,7 @@ func GenerateTokens(userID, ip string, db *storage.DB) (*Tokens, error) {
 		return nil, err
 	}
 
-	return &Tokens{
+	return &m.Tokens{
 		AccessToken:  accessToken,
 		RefreshToken: refreshToken,
 	}, nil
@@ -44,7 +45,7 @@ func generateRefreshToken(userID, ip string) (string, string, error) {
 }
 
 // обновление токенов
-func RefreshTokens(accessToken, refreshToken, ip string, db *storage.DB) (*Tokens, bool, error) {
+func RefreshTokens(accessToken, refreshToken, ip string, db *storage.DB) (*m.Tokens, bool, error) {
 	claims, err := t.ParseAccessToken(accessToken)
 	if err != nil {
 		return nil, false, fmt.Errorf("could not parse access token: %w", err)

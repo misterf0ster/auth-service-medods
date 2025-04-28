@@ -11,6 +11,6 @@ COPY . .
 
 WORKDIR /app/cmd
 
-RUN go build -o auth-app && echo "build successful"
+RUN go build -o auth-app
 
 CMD ["/app/cmd/auth-app"]

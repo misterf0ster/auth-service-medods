@@ -2,7 +2,6 @@ package handler
 
 import (
 	auth "auth-service-medods/internal/service"
-	psql "auth-service-medods/internal/storage"
 	"net/http"
 
 	"github.com/labstack/echo/v4"

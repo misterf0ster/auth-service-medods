@@ -9,11 +9,6 @@ import (
 
 var jwtSecret = []byte("your-256-bit-secret") // Секретный ключ для JWT
 
-type Tokens struct {
-	AccessToken  string `json:"access_token"`
-	RefreshToken string `json:"refresh_token"`
-}
-
 // Генерация Access токена
 func GetAccessToken(userID, ip string) (string, error) {
 	claims := jwt.MapClaims{

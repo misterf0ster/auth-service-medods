@@ -1,37 +1,36 @@
 package storage
 
 import (
+	"auth-service-medods/pkg/logger"
 	"context"
-	"fmt"
-	"log"
 
-	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/jackc/pgx/v5"
 )
 
 type DB struct {
-	Psql *pgxpool.Pool
+	Psql *pgx.Conn
 }
 
-// открываю соединение
+// Открываю коннект
 func Open(url string) (*DB, error) {
-	pool, err := pgxpool.New(context.Background(), url)
+	conn, err := pgx.Connect(context.Background(), url)
 	if err != nil {
-		return nil, fmt.Errorf("database connection error: %w", err)
+		return nil, logger.LogError("Database connection error: %w", err)
 	}
 
-	if err := pool.Ping(context.Background()); err != nil {
-		pool.Close()
-		return nil, fmt.Errorf("error checking database connection: %w", err)
+	if err := conn.Ping(context.Background()); err != nil {
+		conn.Close(context.Background())
+		return nil, logger.LogError("Error checking database connection: %w", err)
 	}
 
-	log.Println("successfully connected to database")
-	return &DB{Psql: pool}, nil
+	logger.LogInfo("Successfully connected to database")
+	return &DB{Psql: conn}, nil
 }
 
-// закрываю соединение
+// Закрываю соединение
 func (db *DB) Close() {
 	if db.Psql != nil {
-		db.Psql.Close()
-		log.Println("Closed")
+		db.Psql.Close(context.Background())
+		logger.LogInfo("Closed database connection")
 	}
 }

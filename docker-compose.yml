@@ -5,26 +5,31 @@ services:
     image: postgres:15
     environment:
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: auth_db
+      POSTGRES_PASSWORD: 12345
+      POSTGRES_DB: medods_db
       TZ: 'Europe/Moscow'
     volumes:
-      - ./migration/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./migrations/0001_create_refresh_token_table.sql:/docker-entrypoint-initdb.d/0001_create_refresh_token_table.sql
     ports:
       - '5432:5432'
     healthcheck:
-      test: ['CMD-SHELL', 'pg_isready -U postgres -d auth_db']
+      test: ['CMD-SHELL', 'pg_isready -U postgres -d medods_db']
       interval: 5s
       timeout: 5s
       retries: 10
 
-  auth-services:
+  api:
     build: .
     depends_on:
       db:
         condition: service_healthy
     environment:
-      DATABASE_URL: 'postgres://postgres:postgres@db:5432/auth_db?sslmode=disable'
+      DB_USER: postgres
+      DB_PASSWORD: 12345
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_NAME: medods_db
+
       PORT: '3000'
       TZ: 'Europe/Moscow'
     ports:
