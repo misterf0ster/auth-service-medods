@@ -1,34 +1,43 @@
 package main
 
 import (
-	h "auth-service-medods/internal/handler"
+	"auth-service-medods/internal/handler"
 	psql "auth-service-medods/internal/storage"
+	"auth-service-medods/pkg/config"
+	"auth-service-medods/pkg/logger"
 	"os"
 
-	"github.com/labstack/echo/v4"
+	"github.com/gin-gonic/gin"
 )
 
 func main() {
-	URL := os.Getenv("DATABASE_URL")
-	if URL == "" {
-		panic("DATABASE_URL not found")
-	}
+	logger.LoggerInit()
 
-	PORT := os.Getenv("PORT")
-	if PORT == "" {
-		panic("PORT not found")
-	}
+	logger.LogInfo("Starting the service...")
 
-	db, err := psql.Open(URL)
+	config.LoadEnv()
+	cfg := config.Config()
+
+	url := cfg.DBaseURL()
+	conn, err := psql.Open(url)
 	if err != nil {
-		panic(err)
+		logger.Log.Fatalf("Unable to connect to db: %v\n", err)
 	}
-	defer db.Close()
+	defer conn.Close()
 
-	e := echo.New()
+	h := handler.CreateUserHandler(conn)
+	g := gin.Default()
 
-	e.POST("/token", h.GetAccessRefresh)
-	e.POST("/refresh", h.PostRefresh)
+	g.POST("/token", h.GetAccessRefresh)
+	g.POST("/refresh", h.PostRefresh)
 
-	e.Start(PORT)
+	port := os.Getenv("PORT")
+	if port == "" {
+		logger.LogInfo("Port not found")
+	}
+
+	logger.Log.Println("Starting server on port", port)
+	if err := g.Run(":" + port); err != nil {
+		logger.Log.Fatal("Server startup error: " + err.Error())
+	}
 }

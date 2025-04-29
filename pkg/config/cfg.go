@@ -1,7 +1,7 @@
 package config
 
 import (
-	"effective-mobile-task/pkg/logger"
+	"auth-service-medods/pkg/logger"
 	"fmt"
 	"os"
 

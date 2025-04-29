@@ -1,30 +1,55 @@
 package handler
 
 import (
+	m "auth-service-medods/internal/models"
 	auth "auth-service-medods/internal/service"
+	psql "auth-service-medods/internal/storage"
+	"auth-service-medods/pkg/logger"
+	"context"
 	"net/http"
 
+	"github.com/gin-gonic/gin"
 	"github.com/labstack/echo/v4"
 )
 
-// Контроллер для получения Access и Refresh токенов
-func GetAccessRefresh(c echo.Context) error {
-	userID := c.QueryParam("user_id")
-	ip := c.RealIP()
-
-	db := c.Get("db").(*psql.DB) // Получаем подключение к базе данных
-
-	tokens, err := auth.GenerateTokens(userID, ip, db)
-	if err != nil {
-		return c.JSON(http.StatusInternalServerError, map[string]string{
-			"error": "could not generate tokens",
-		})
-	}
-
-	return c.JSON(http.StatusOK, tokens)
+type UserHandler struct {
+	DB *psql.DB
 }
 
-// Контроллер для обновления токенов
+func CreateUserHandler(db *psql.DB) *UserHandler {
+	return &UserHandler{DB: db}
+}
+
+// GET
+func (h *UserHandler) GetAccessRefresh(c *gin.Context) {
+	id := c.Param("id")
+	sql := "SELECT ip, token_hash, user_id FROM refresh_token"
+
+	rows, err := h.DB.Psql.Query(context.Background(), sql)
+	if err != nil {
+		logger.LogError("Database connect fals", err)
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"Message": "Database connect fals",
+			"Status":  "Error",
+		})
+		return
+	}
+	defer rows.Close()
+
+	var refresh []m.Tokens
+	for rows.Next() {
+		var u m.Tokens
+		if err := rows.Scan(&u.AccessToken, &u.RefreshToken, id); err == nil {
+			refresh = append(refresh, u)
+		}
+		return
+	}
+
+	logger.LogInfo("Tokens get successfully")
+	c.JSON(http.StatusOK, refresh)
+}
+
+// POST
 func PostRefresh(c echo.Context) error {
 	accessToken := c.FormValue("access_token")
 	refreshToken := c.FormValue("refresh_token")
