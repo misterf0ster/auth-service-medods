@@ -35,8 +35,8 @@ func GenerateTokens(userID, ip string, db *storage.DB) (*m.Tokens, error) {
 
 // генерация refresh токена
 func generateRefreshToken(userID, ip string) (string, string, error) {
-	refreshToken := generateRandomString(64)
-	hashedRefreshToken, err := HashRefreshToken(refreshToken)
+	refreshToken := t.GenerateUUID(64)
+	hashedRefreshToken, err := t.HashRefreshToken(refreshToken)
 	if err != nil {
 		return "", "", err
 	}

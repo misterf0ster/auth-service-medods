@@ -8,7 +8,7 @@ import (
 )
 
 // генерация случайного UUID
-func generateUUID(length int) string {
+func GenerateUUID(length int) string {
 	return uuid.New().String()[:length]
 }
 
