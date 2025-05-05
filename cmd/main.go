@@ -1,10 +1,10 @@
 package main
 
 import (
-	"auth-service-medods/internal/handler"
-	psql "auth-service-medods/internal/storage"
-	"auth-service-medods/pkg/config"
-	"auth-service-medods/pkg/logger"
+	"effective-mobile-task/internal/handler"
+	psql "effective-mobile-task/internal/storage"
+	"effective-mobile-task/pkg/config"
+	"effective-mobile-task/pkg/logger"
 	"os"
 
 	"github.com/gin-gonic/gin"
