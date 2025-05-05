@@ -7,7 +7,7 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
-var jwtSecret = []byte("your-256-bit-secret") // Секретный ключ для JWT
+var jwtSecret = []byte("secretkeysha512") // Секретный ключ для JWT
 
 // Генерация Access токена
 func GetAccessToken(userID, ip string) (string, error) {
