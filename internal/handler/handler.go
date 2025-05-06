@@ -9,7 +9,6 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/labstack/echo/v4"
 )
 
 type TokenHandler struct {
@@ -50,12 +49,10 @@ func (h *TokenHandler) GetAccessRefresh(c *gin.Context) {
 }
 
 // POST
-func (h *TokenHandler) PostRefresh(c echo.Context) {
-	accessToken := c.FormValue("access_token")
-	refreshToken := c.FormValue("refresh_token")
-	ip := c.RealIP()
-
-	db := c.Get("db").(*psql.DB) // Получаем подключение к базе данных
+func (h *TokenHandler) PostRefresh(c *gin.Context) {
+	accessToken := c.Param("access_token")
+	refreshToken := c.Param("refresh_token")
+	ip := c.ClientIP()
 
 	tokens, ipChanged, err := auth.RefreshTokens(accessToken, refreshToken, ip, db)
 	if err != nil {
