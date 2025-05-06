@@ -12,16 +12,16 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-type UserHandler struct {
+type TokenHandler struct {
 	DB *psql.DB
 }
 
-func CreateUserHandler(db *psql.DB) *UserHandler {
-	return &UserHandler{DB: db}
+func CreateToken(db *psql.DB) *TokenHandler {
+	return &TokenHandler{DB: db}
 }
 
 // GET
-func (h *UserHandler) GetAccessRefresh(c *gin.Context) {
+func (h *TokenHandler) GetAccessRefresh(c *gin.Context) {
 	id := c.Param("id")
 	sql := "SELECT ip, token_hash, user_id FROM refresh_token"
 
@@ -50,7 +50,7 @@ func (h *UserHandler) GetAccessRefresh(c *gin.Context) {
 }
 
 // POST
-func (h *UserHandler) PostRefresh(c echo.Context) error {
+func (h *TokenHandler) PostRefresh(c echo.Context) {
 	accessToken := c.FormValue("access_token")
 	refreshToken := c.FormValue("refresh_token")
 	ip := c.RealIP()
@@ -59,7 +59,7 @@ func (h *UserHandler) PostRefresh(c echo.Context) error {
 
 	tokens, ipChanged, err := auth.RefreshTokens(accessToken, refreshToken, ip, db)
 	if err != nil {
-		return c.JSON(http.StatusUnauthorized, map[string]string{
+		c.JSON(http.StatusUnauthorized, map[string]string{
 			"error": "invalid refresh token",
 		})
 	}
@@ -69,5 +69,5 @@ func (h *UserHandler) PostRefresh(c echo.Context) error {
 		println("Warning: IP address changed. Email notification sent.")
 	}
 
-	return c.JSON(http.StatusOK, tokens)
+	c.JSON(http.StatusOK, tokens)
 }

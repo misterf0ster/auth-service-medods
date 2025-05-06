@@ -25,7 +25,7 @@ func main() {
 	}
 	defer conn.Close()
 
-	h := handler.CreateUserHandler(conn)
+	h := handler.CreateToken(conn)
 	g := gin.Default()
 
 	g.GET("/token", h.GetAccessRefresh)
