@@ -50,7 +50,7 @@ func (h *UserHandler) GetAccessRefresh(c *gin.Context) {
 }
 
 // POST
-func PostRefresh(c echo.Context) error {
+func (h *UserHandler) PostRefresh(c echo.Context) error {
 	accessToken := c.FormValue("access_token")
 	refreshToken := c.FormValue("refresh_token")
 	ip := c.RealIP()

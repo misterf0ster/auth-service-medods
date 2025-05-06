@@ -28,7 +28,7 @@ func main() {
 	h := handler.CreateUserHandler(conn)
 	g := gin.Default()
 
-	g.POST("/token", h.GetAccessRefresh)
+	g.GET("/token", h.GetAccessRefresh)
 	g.POST("/refresh", h.PostRefresh)
 
 	port := os.Getenv("PORT")
