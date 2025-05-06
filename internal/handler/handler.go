@@ -52,9 +52,9 @@ func (h *TokenHandler) GetAccessRefresh(c *gin.Context) {
 func (h *TokenHandler) PostRefresh(c *gin.Context) {
 	accessToken := c.Param("access_token")
 	refreshToken := c.Param("refresh_token")
-	ip := c.ClientIP()
+	ip := c.Param("ip")
 
-	tokens, ipChanged, err := auth.RefreshTokens(accessToken, refreshToken, ip, db)
+	tokens, ipChanged, err := auth.RefreshTokens(accessToken, refreshToken, ip)
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, map[string]string{
 			"error": "invalid refresh token",

@@ -45,7 +45,7 @@ func GenerateRefreshToken(userID, ip string) (string, string, error) {
 }
 
 // обновление токенов
-func RefreshTokens(accessToken, refreshToken, ip string, db *storage.DB) (*m.Tokens, bool, error) {
+func RefreshTokens(accessToken, refreshToken, ip string) (*m.Tokens, bool, error) {
 	claims, err := t.ParseAccessToken(accessToken)
 	if err != nil {
 		return nil, false, fmt.Errorf("could not parse access token: %w", err)
@@ -69,7 +69,7 @@ func RefreshTokens(accessToken, refreshToken, ip string, db *storage.DB) (*m.Tok
 	}
 
 	//генерация новых токенов
-	tokens, err := GenerateTokens(userID, ip, db)
+	tokens, err := GenerateTokens(userID, ip)
 	if err != nil {
 		return nil, ipChanged, fmt.Errorf("could not generate new tokens: %w", err)
 	}
