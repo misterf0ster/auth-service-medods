@@ -4,6 +4,7 @@ import (
 	m "auth-service-medods/internal/models"
 	"auth-service-medods/internal/storage"
 	t "auth-service-medods/internal/token"
+	"auth-service-medods/pkg/logger"
 	"fmt"
 )
 
@@ -48,6 +49,7 @@ func GenerateRefreshToken(userID, ip string) (string, string, error) {
 func RefreshTokens(accessToken, refreshToken, ip string) (*m.Tokens, bool, error) {
 	claims, err := t.ParseAccessToken(accessToken)
 	if err != nil {
+		logger.LogError("could not parse access token: %w", err)
 		return nil, false, fmt.Errorf("could not parse access token: %w", err)
 	}
 
@@ -56,9 +58,11 @@ func RefreshTokens(accessToken, refreshToken, ip string) (*m.Tokens, bool, error
 	//проверка refresh токена
 	valid, storedIP, err := db.VerifyRefreshToken(userID, refreshToken)
 	if err != nil {
+		logger.LogError("could not verify refresh token: %w", err)
 		return nil, false, fmt.Errorf("could not verify refresh token: %w", err)
 	}
 	if !valid {
+		logger.LogInfo("invalid refresh token")
 		return nil, false, fmt.Errorf("invalid refresh token")
 	}
 
@@ -71,6 +75,7 @@ func RefreshTokens(accessToken, refreshToken, ip string) (*m.Tokens, bool, error
 	//генерация новых токенов
 	tokens, err := GenerateTokens(userID, ip)
 	if err != nil {
+		logger.LogError("could not generate new tokens: %w", err)
 		return nil, ipChanged, fmt.Errorf("could not generate new tokens: %w", err)
 	}
 
